@@ -1,3 +1,2 @@
 #!/bin/Bash
-pwd -P
-<this is an empty line>
+pwd -P\n
