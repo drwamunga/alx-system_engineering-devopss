@@ -1,2 +1,2 @@
 #!/bin/Bash
-pwd -P\n
+pwd\n
