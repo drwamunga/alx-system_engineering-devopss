@@ -1,2 +1,2 @@
 #!/bin/Bash
-pwd -L\n
+echo $PWD\n
