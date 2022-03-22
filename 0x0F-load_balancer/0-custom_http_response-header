@@ -1,14 +1,36 @@
 #!/usr/bin/env bash
-# custom header
-SRC="/etc/nginx/sites-available/default"
-REDIR="\\\tlocation /redirect_me {\n\t\t return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n\t}\n"
-ERRDIR="\\\n\terror_page 404 /custom_404.html;\n\tlocation = /custom_404.html {\n\t\troot /usr/share/nginx/html;\n\t\tinternal;\n\t}\n"
-HEADER="\\\n\tadd_header X-Served-By \$[STUDENT_ID]-web-01;\n"
-sudo apt-get -y update
-sudo apt-get -y install nginx
-echo "X-Served-By" | sudo tee /usr/share/nginx/html/index.html
-sudo sed -i "30i $REDIR" $SRC
-sudo sed -i "28i $HEADER" $SRC
-echo "Ceci n'est pas une page" | sudo tee /usr/share/nginx/html/custom_404.html
-sudo sed -i "48i $ERRDIR" $SRC
+# Configures my nginx server and add a custom header
+
+sudo apt-get update && sudo apt-get install nginx -y
+
+sudo chown -R "$USER":"$USER" /var/www/html/index.nginx-debian.html
+sudo chown -R "$USER":"$USER" /etc/nginx/sites-available/default
+sudo chown -R "$USER":"$USER" /var/www/html
+
+echo "Hello World!" > /var/www/html/index.nginx-debian.html
+echo "Ceci n'est pas une page" > /var/www/html/404.html
+
+config=\
+"server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+               root /var/www/html;
+        index index.html index.htm index.nginx-debian.html;
+        server_name _;
+        location / {
+		add_header X-Served-By \$hostname;
+                try_files \$uri \$uri/ =404;
+        }
+        error_page 404 /404.html;
+        location  /404.html {
+            internal;
+        }
+        
+        if (\$request_filename ~ redirect_me){
+            rewrite ^ https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;
+        }
+}"
+
+echo -e "$config" > /etc/nginx/sites-available/default
+
 sudo service nginx restart
