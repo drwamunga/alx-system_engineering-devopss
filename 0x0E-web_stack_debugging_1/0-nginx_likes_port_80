@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# container-specific fix to restore nginx service listening (only) on port 80
-In -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-NGINX_PID=$(pgrep -u root nginx)
-echo "$NGINX_PID" > /run/nginx.pid
-service nginx reload
+# debugging nginx port 80
+sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+sudo service nginx restart
